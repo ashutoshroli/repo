@@ -1,0 +1,39 @@
+name = "chhath-public-api"
+main = "src/index.js"
+compatibility_date = "2025-01-01"
+
+[vars]
+
+[[kv_namespaces]]
+binding = "KV_PUBLIC"
+id = "dce0bc8851694b7883030edd6643859e"
+
+[[d1_databases]]
+binding = "DB_CORE"
+database_name = "chhath-core"
+database_id = "06edd936-b186-47f3-93fb-72f0dc840849"
+
+[[d1_databases]]
+binding = "DB_COLLECTIONS"
+database_name = "chhath-collections"
+database_id = "6a1fb670-ec32-457a-b90f-635b33afc67c"
+
+[[d1_databases]]
+binding = "DB_LOANS_EXPENSES"
+database_name = "chhath-loans-expenses"
+database_id = "ef3e1e5d-1254-488c-9d6e-8a5121a613c9"
+
+[[d1_databases]]
+binding = "DB_FILE_INDEX"
+database_name = "chhath-file-index"
+database_id = "958869d9-78bf-48ba-9c31-c2c6271b52eb"
+
+[[d1_databases]]
+binding = "DB_MISC"
+database_name = "chhath-misc"
+database_id = "a9298585-e108-4f7e-b555-7da7fc0a1921"
+
+[[d1_databases]]
+binding = "DB_LOGS"
+database_name = "chhath-logs"
+database_id = "b4204316-e268-4fc3-bb4c-922cd291fb22"

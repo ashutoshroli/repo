@@ -1,0 +1,94 @@
+<script lang="ts">
+  import { Crown } from '@lucide/svelte';
+  import type { Ranked } from '$lib/utils/ranking';
+  import { contributorTags, type Contributor } from '$lib/api/derive';
+  import { fmt, initials, avatarGradient } from '$lib/utils/format';
+  import { lang, tr } from '$lib/stores/lang';
+
+  interface Props {
+    entry: Ranked<Contributor>;
+    compact?: boolean;
+    onclick?: () => void;
+  }
+  let { entry, compact = true, onclick }: Props = $props();
+
+  let c = $derived(entry.item);
+  let displayName = $derived($lang === 'hi' && c.nameHindi ? c.nameHindi : c.name);
+  let grad = $derived(avatarGradient(c.key));
+  let tags = $derived(contributorTags(c));
+  let nonMoneyTags = $derived(tags.filter((t) => t !== 'money') as Array<'material' | 'service'>);
+  const tagLabel = (t: 'material' | 'service') => (t === 'material' ? $tr('material') : $tr('service'));
+
+  let photoFailed = $state(false);
+  $effect(() => {
+    void c.photo;
+    photoFailed = false;
+  });
+</script>
+
+<button
+  type="button"
+  {onclick}
+  class="relative flex flex-col items-center rounded-2xl border p-3 text-center transition
+    active:scale-[.97] focus-visible:ring-2
+    {entry.isTop
+      ? 'border-gold/70 bg-gradient-to-b from-amber-50 to-amber-100 shadow-[0_6px_18px_-8px_rgba(245,184,64,.6)] dark:from-amber-500/15 dark:to-amber-700/10'
+      : 'border-black/5 bg-white/70 dark:border-white/10 dark:bg-white/5'}
+    {compact ? 'w-[104px] shrink-0 snap-start' : 'w-full'}"
+>
+  {#if entry.isTop}
+    <span
+      class="absolute -top-2.5 left-1/2 -translate-x-1/2 text-gold drop-shadow"
+      aria-hidden="true"
+    >
+      <Crown class="h-4 w-4 fill-current" />
+    </span>
+    <span
+      class="absolute left-1.5 top-1.5 grid h-5 w-5 place-items-center rounded-full bg-gold
+        text-[10px] font-black text-amber-900"
+      aria-label="Rank {entry.rank}"
+    >
+      {entry.rank}
+    </span>
+  {/if}
+
+  {#if c.photo && !photoFailed}
+    <img
+      src={c.photo}
+      alt={displayName}
+      loading="lazy"
+      class="mt-1 h-11 w-11 rounded-full object-cover"
+      onerror={() => (photoFailed = true)}
+    />
+  {:else}
+    <span
+      class="mt-1 grid h-11 w-11 place-items-center rounded-full text-sm font-black text-white"
+      style="background-image: linear-gradient(135deg, {grad[0]}, {grad[1]})"
+      aria-hidden="true"
+    >
+      {initials(displayName)}
+    </span>
+  {/if}
+
+  <span class="mt-2 line-clamp-1 w-full text-[11px] font-bold" title={displayName}>{displayName}</span>
+
+  {#if c.hasMoney}
+    <span class="mt-0.5 text-sm font-black text-brand-600 dark:text-brand-300">{fmt(c.amount)}</span>
+  {/if}
+  {#if nonMoneyTags.length}
+    <span class="mt-0.5 flex flex-wrap justify-center gap-0.5">
+      {#each nonMoneyTags as t}
+        <span class="rounded-full bg-info/15 px-2 py-0.5 text-[9px] font-bold text-info">{tagLabel(t)}</span>
+      {/each}
+    </span>
+  {/if}
+  {#if c.count > 1}
+    <span class="mt-0.5 text-[9px] font-semibold text-slate-400">{$tr('times_contributed', { count: c.count })}</span>
+  {/if}
+
+  {#if entry.isTop}
+    <span class="mt-1 rounded-full bg-gold/20 px-2 py-0.5 text-[8px] font-black uppercase tracking-wide text-amber-700 dark:text-amber-300">
+      {$tr('top5')}
+    </span>
+  {/if}
+</button>
